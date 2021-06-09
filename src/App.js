@@ -25,7 +25,7 @@ class App extends Component {
       return ( 
         <div className="wrapper">
           <main>
-            <h1 className="title">Design and Construction of <br /> UAC for weapons</h1>
+            <h1 className="title">Design and Construction of <br /> UAV for weapons</h1>
             
             <div className="content">
               <p className="by">By</p>
