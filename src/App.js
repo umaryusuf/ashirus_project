@@ -1,107 +1,54 @@
 import React, { Component } from "react";
 
-import * as cocoSsd from "@tensorflow-models/coco-ssd";
-import "@tensorflow/tfjs";
 
-import './App.css';
+import './welcome.css';
+import Project from './Project';
 
 class App extends Component {
-  videoRef = React.createRef();
-  canvasRef = React.createRef();
+  constructor(props) {
+    super();
 
-  componentDidMount() {
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      const webCamPromise = navigator.mediaDevices
-        .getUserMedia({
-          audio: false,
-          video: {
-            facingMode: "user"
-          }
-        })
-        .then(stream => {
-          window.stream = stream;
-          this.videoRef.current.srcObject = stream;
-          return new Promise((resolve, reject) => {
-            this.videoRef.current.onloadedmetadata = () => {
-              resolve();
-            };
-          });
-        });
-      const modelPromise = cocoSsd.load();
-      Promise.all([modelPromise, webCamPromise])
-        .then(values => {
-          this.detectFrame(this.videoRef.current, values[0]);
-        })
-        .catch(error => {
-          console.error(error);
-        });
+    this.state = {
+      page: "welcome"
     }
   }
 
-  detectFrame = (video, model) => {
-    model.detect(video).then(predictions => {
-      this.renderPredictions(predictions);
-      requestAnimationFrame(() => {
-        this.detectFrame(video, model);
-      });
+  openProject = e => {
+    //console.log('clicked open project')
+    this.setState((state, props) => {
+      return {page: 'project'}
     });
-  };
-
-  renderPredictions = predictions => {
-    const ctx = this.canvasRef.current.getContext("2d");
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    // Font options.
-    const font = "16px sans-serif";
-    ctx.font = font;
-    ctx.textBaseline = "top";
-    predictions.forEach(prediction => {
-      const x = prediction.bbox[0];
-      const y = prediction.bbox[1];
-      console.log("class", prediction.class)
-      console.log("x, y", x, y);
-      const width = prediction.bbox[2];
-      const height = prediction.bbox[3];
-      // Draw the bounding box.
-      ctx.strokeStyle = "#00FFFF";
-      ctx.lineWidth = 4;
-      ctx.strokeRect(x, y, width, height);
-      // Draw the label background.
-      ctx.fillStyle = "#00FFFF";
-      const textWidth = ctx.measureText(prediction.class).width;
-      const textHeight = parseInt(font, 10); // base 10
-      ctx.fillRect(x, y, textWidth + 4, textHeight + 4);
-    });
-
-    predictions.forEach(prediction => {
-      const x = prediction.bbox[0];
-      const y = prediction.bbox[1];
-      // Draw the text last to ensure it's on top.
-      ctx.fillStyle = "#000000";
-      ctx.fillText(prediction.class, x, y);
-    });
-  };
+  }
 
   render() {
-    return (
-      <div className="container">
-        <video
-          className="size"
-          autoPlay
-          playsInline
-          muted
-          ref={this.videoRef}
-          width="900"
-          height="800"
-
-        />
-        <canvas
-          className="size"
-          ref={this.canvasRef}
-          width="900"
-          height="800"
-        />
-      </div>
-    );
+    if(this.state.page === 'welcome') {
+      return ( 
+        <div className="wrapper">
+          <main>
+            <h1 className="title">Design and Construction of <br /> UAC for weapons</h1>
+            
+            <div className="content">
+              <p className="by">By</p>
+              <p><span className="name">Ashiru A. Ashiru</span> <br /> NAS/PHY/16/2023 <br /> Alqalam University </p>
+            </div>
+            <br /><br />
+            <div>
+              <button className="button" onClick={() => this.openProject()}>Open Project</button>
+            </div>
+            <br />
+          </main>
+          
+          <footer>
+            © 2021 | Design by Ashiru A. Ashiru
+          </footer>
+        </div>
+        );
+    } else {
+      return (
+        <Project />
+      )
+    }
+    
   }
 }
 
